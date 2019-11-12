@@ -13,9 +13,8 @@ public:
 	int GetGridHeight() const;
 	bool IsInsideBoard( const Location& loc ) const;
 	int GetContents(const Location& loc) const;
-	void SpawnObstacle(std::mt19937& rng, const class Snake& snake);
+	void SpawnContents(std::mt19937& rng, const class Snake& snake, int contentsType);
 	void ConsumeContents(const Location& loc);
-	void SpawnFood(std::mt19937& rng, const class Snake& snake);
 	void DrawBorder();
 	void DrawCells();
 private:
