@@ -56,10 +56,10 @@ private:
 	SoundEffect sfxSlither = SoundEffect( { L"Sounds\\Slither0.wav",L"Sounds\\Slither1.wav",L"Sounds\\Slither2.wav" } );
 	Sound sndMusic = Sound( L"Sounds\\Music_Loop.wav",Sound::LoopType::AutoFullSound );
 	Sound sndTitle = Sound( L"Sounds\\Title.wav" );
-	Sound sndFart = Sound( L"Sounds\\Fart.wav" );
-	static constexpr float snekMovePeriodMin = 0.04f;
+	SoundEffect sndFart = SoundEffect( { L"Sounds\\Fart.wav" } );
+	static constexpr float snekMovePeriodMin = 0.040f;
 	static constexpr float snekMovePeriodSpeedup = 0.15f;
-	static constexpr int nPoison = 100;
+	static constexpr int nPoison = 10;
 	static constexpr int nFood = 12;
 	float snekMovePeriod = 0.4f;
 	float snekMoveCounter = 0.0f;
