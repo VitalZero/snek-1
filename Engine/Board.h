@@ -3,17 +3,29 @@
 #include "Graphics.h"
 #include "Location.h"
 #include <random>
+#include "Settings.h"
 
 class Board
 {
 public:
-	Board( Graphics& gfx );
+	enum class CellContents
+	{
+		Empty, 
+		Obstacle,
+		Food,
+		Poison
+	};
+public:
+	Board(const Settings& settings, Graphics& gfx );
+	~Board();
+	Board(const Board&) = delete;
+	Board& operator=(const Board&) = delete;
 	void DrawCell( const Location& loc,Color c );
 	int GetGridWidth() const;
 	int GetGridHeight() const;
 	bool IsInsideBoard( const Location& loc ) const;
-	int GetContents(const Location& loc) const;
-	void SpawnContents(std::mt19937& rng, const class Snake& snake, int contentsType);
+	CellContents GetContents(const Location& loc) const;
+	void SpawnContents(std::mt19937& rng, const class Snake& snake, CellContents contentsType);
 	void ConsumeContents(const Location& loc);
 	void DrawBorder();
 	void DrawCells();
@@ -22,15 +34,14 @@ private:
 	static constexpr Color obstacleColor = Colors::Gray;
 	static constexpr Color poisonColor = { 64, 8, 64 };
 	static constexpr Color foodColor = Colors::Red;
-	static constexpr int dimension = 20;
+	int dimension;
 	static constexpr int cellPadding = 1;
-	static constexpr int width = 32;
-	static constexpr int height = 24;
+	int width;
+	int height;
 	static constexpr int borderWidth = 4;
 	static constexpr int borderPadding = 2;
 	static constexpr int x = 70;
 	static constexpr int y = 50;
-	// 0: empty 1: obstacle 2: food 3: poison
-	int contents[width * height] = {0};
+	CellContents* contents = nullptr;
 	Graphics& gfx;
 };

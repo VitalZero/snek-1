@@ -2,10 +2,24 @@
 #include "Snake.h"
 #include <assert.h>
 
-Board::Board( Graphics& gfx )
+Board::Board(const Settings& settings, Graphics& gfx )
 	:
-	gfx( gfx )
-{}
+	gfx( gfx ),
+	dimension(settings.GetTileSize()),
+	width(settings.GetBoardWidth()),
+	height(settings.GetBoardHeight()),
+	contents(new CellContents[width * height])
+{
+	for (int i = 0; i < width * height; ++i)
+	{
+		contents[i] = CellContents::Empty;
+	}
+}
+
+Board::~Board()
+{
+	delete[] contents;
+}
 
 void Board::DrawCell( const Location & loc,Color c )
 {
@@ -36,12 +50,12 @@ bool Board::IsInsideBoard( const Location & loc ) const
 		loc.y >= 0 && loc.y < height;
 }
 
-int Board::GetContents(const Location & loc) const
+Board::CellContents Board::GetContents(const Location & loc) const
 {
 	return contents[loc.y * width + loc.x];
 }
 
-void Board::SpawnContents(std::mt19937 & rng, const Snake & snake, int contentsType)
+void Board::SpawnContents(std::mt19937 & rng, const Snake & snake, Board::CellContents contentsType)
 {
 	std::uniform_int_distribution<int> xDist(0, GetGridWidth() - 1);
 	std::uniform_int_distribution<int> yDist(0, GetGridHeight() - 1);
@@ -51,15 +65,15 @@ void Board::SpawnContents(std::mt19937 & rng, const Snake & snake, int contentsT
 	{
 		newLoc.x = xDist(rng);
 		newLoc.y = yDist(rng);
-	} while (snake.IsInTile(newLoc) || GetContents(newLoc) != 0);
+	} while (snake.IsInTile(newLoc) || GetContents(newLoc) != CellContents::Empty);
 
 	contents[newLoc.y * width + newLoc.x] = contentsType;
 }
 
 void Board::ConsumeContents(const Location & loc)
 {
-	assert(GetContents(loc) == 2 || GetContents(loc) == 3);
-	contents[loc.y * width + loc.x] = 0;
+	assert(GetContents(loc) == CellContents::Food || GetContents(loc) == CellContents::Poison);
+	contents[loc.y * width + loc.x] = CellContents::Empty;
 }
 
 void Board::DrawBorder()
@@ -85,18 +99,26 @@ void Board::DrawCells()
 	{
 		for (int x = 0; x < width; ++x)
 		{
-			const int contents = GetContents({ x,y });
-			if (contents == 1)
+			const CellContents contents = GetContents({ x,y });
+			switch (GetContents({ x,y }))
+			{
+			case CellContents::Obstacle:
 			{
 				DrawCell({ x,y }, obstacleColor);
+				break;
 			}
-			else if (contents == 2)
+			case CellContents::Food:
 			{
 				DrawCell({ x,y }, foodColor);
+				break;
 			}
-			else if (contents == 3)
+			case CellContents::Poison:
 			{
 				DrawCell({ x, y }, poisonColor);
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
